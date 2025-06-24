@@ -1,0 +1,73 @@
+{
+    "usuarios": [
+      {
+        "id": 1,
+        "nome": "Larissa",
+        "email": "larissa@email.com",
+        "senha": "123456",
+        "tipo": "Monitor",
+        "comentario": "Adoro ajudar com dúvidas!",
+        "disciplinas": ["Química", "Biologia"],
+        "fotoPerfil": null
+      }
+    ],
+    "notificacoes": [
+      {
+        "id": 1,
+        "texto": "📝 Nova lista de exercícios disponível para Redação.",
+        "data": "25/06/2025"
+      },
+      {
+        "id": 2,
+        "texto": "📢 Monitor de Química alterou o horário da aula de hoje.",
+        "data": "24/06/2025"
+      }
+    ],
+    "agenda": [
+      {
+        "id": 1,
+        "perfil": "monitor",
+        "agenda": [
+          { "dia": "Segunda", "horario": "14h às 15h", "materia": "Química", "assunto": "Funções Orgânicas" },
+          { "dia": "Terça", "horario": "10h às 11h", "materia": "Biologia", "assunto": "Ecossistemas" },
+          { "dia": "Quinta", "horario": "15h às 16h", "materia": "Química", "assunto": "Reações Inorgânicas" }
+        ]
+      },
+      {
+        "id": 2,
+        "perfil": "aluno",
+        "agenda": [
+          { "dia": "Segunda", "horario": "08h às 09h", "materia": "Matemática", "assunto": "Funções" },
+          { "dia": "Quarta", "horario": "09h às 10h", "materia": "Redação", "assunto": "Interpretação de Tema" },
+          { "dia": "Sexta", "horario": "10h às 11h", "materia": "Física", "assunto": "Cinemática" }
+        ]
+      }
+    ],
+    "disciplinas": [
+      {
+        "id": "Química",
+        "horarios": ["Segunda: 14h às 15h", "Quinta: 8h às 12h"],
+        "aulas": ["Segunda: 8h às 12h", "Quarta: 12h às 14h", "Quinta: 16h às 19h"],
+        "materiais": ["Material_Quimica.pdf"],
+        "listas": ["ListaExercicios_Quimica.pdf"],
+        "comentarios": [
+          "@Aluno: Melhor aula, aprendi mais aqui do que na escola.",
+          "@Aluno3: Amei os materiais! São claros e organizados.",
+          "@Aluno7: Agora só tiro 10 em Química!"
+        ]
+      }
+    ],
+    "home": {
+      "subjects": [
+        { "name": "Matemática", "icon": "calculator", "color": "#7DD3FC", "lib": "FontAwesome" },
+        { "name": "Física", "icon": "ios-planet", "color": "#FACC15", "lib": "Ionicons" },
+        { "name": "Química", "icon": "flask", "color": "#C084FC", "lib": "FontAwesome" }
+      ],
+      "monitors": [
+        { "name": "Monitor Matemática", "rating": 4.5, "image": "https://placehold.co/100x100" },
+        { "name": "Monitor Física", "rating": 4.8, "image": "https://placehold.co/100x100" }
+      ]
+    },
+    "login": []
+  }
+  
