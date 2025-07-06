@@ -1,0 +1,114 @@
+{
+  "usuarios": [
+    {
+      "id": "d6b4",
+      "nome": "Larissa",
+      "email": "larissa@email.com",
+      "senha": "123456",
+      "tipo": "Monitor",
+      "comentario": "Adoro ajudar com dúvidas!",
+      "disciplinas": ["Química", "Biologia"],
+      "fotoPerfil": null
+    }
+  ],
+  "agenda": [
+    {
+      "id": "e7d1"
+    },
+    {
+      "id": "24a8"
+    },
+    {
+      "id": "5d35",
+      "perfil": "monitor",
+      "agenda": [
+        {
+          "dia": "Segunda",
+          "horario": "14h às 15h",
+          "materia": "Química",
+          "assunto": "Funções Orgânicas"
+        },
+        {
+          "dia": "Terça",
+          "horario": "10h às 11h",
+          "materia": "Biologia",
+          "assunto": "Ecossistemas"
+        },
+        {
+          "dia": "Quinta",
+          "horario": "15h às 16h",
+          "materia": "Química",
+          "assunto": "Reações Inorgânicas"
+        }
+      ]
+    }
+  ],
+  "notificacoes": [
+    {
+      "id": "76ce"
+    },
+    {
+      "id": "553a"
+    },
+    {
+      "id": "0955",
+      "texto": "📢 Monitor de Biologia disponibilizou novo material!",
+      "data": "05/07/2025"
+    }
+  ],
+  "disciplinas": [
+    {
+      "id": "c85b"
+    },
+    {
+      "id": "Química",
+      "horarios": [
+        "Segunda: 14h às 15h",
+        "Quinta: 8h às 12h"
+      ],
+      "aulas": [
+        "Segunda: 8h às 12h",
+        "Quarta: 12h às 14h",
+        "Quinta: 16h às 19h"
+      ],
+      "materiais": [
+        "Material_Quimica.pdf"
+      ],
+      "listas": [
+        "ListaExercicios_Quimica.pdf"
+      ],
+      "comentarios": [
+        "@Aluno: Melhor aula, aprendi mais aqui do que na escola.",
+        "@Aluno3: Amei os materiais! São claros e organizados."
+      ]
+    }
+  ],
+  "home": {
+    "subjects": [
+      {
+        "name": "Matemática",
+        "icon": "calculator",
+        "color": "#7DD3FC",
+        "lib": "FontAwesome"
+      },
+      {
+        "name": "Física",
+        "icon": "ios-planet",
+        "color": "#FACC15",
+        "lib": "Ionicons"
+      }
+    ],
+    "monitors": [
+      {
+        "name": "Monitor Matemática",
+        "rating": 4.5,
+        "image": "https://placehold.co/100x100"
+      },
+      {
+        "name": "Monitor Física",
+        "rating": 4.8,
+        "image": "https://placehold.co/100x100"
+      }
+    ]
+  }
+}
