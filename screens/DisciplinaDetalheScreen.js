@@ -1,52 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-const dadosDisciplinas = {
-  Química: {
-    horarios: ['Segunda: 14h às 15h', 'Quinta: 8h às 12h'],
-    aulas: ['Segunda: 8h às 12h', 'Quarta: 12h às 14h', 'Quinta: 16h às 19h'],
-    materiais: ['Material_Quimica.pdf'],
-    listas: ['ListaExercicios_Quimica.pdf'],
-    comentarios: [
-      '@Aluno: Melhor aula, aprendi mais aqui do que na escola.',
-      '@Aluno3: Amei os materiais! São claros e organizados.',
-      '@Aluno7: Agora só tiro 10 em Química!'
-    ]
-  },
-  Física: {
-    horarios: ['Terça: 9h às 11h'],
-    aulas: ['Terça: 11h às 13h', 'Sexta: 15h às 18h'],
-    materiais: ['Apostila_Fisica.pdf'],
-    listas: ['Listas_Fisica_Nivel2.pdf'],
-    comentarios: [
-      '@Aluno: As monitorias de física salvaram minha média!',
-      '@Aluno2: O monitor explica de forma muito prática.'
-    ]
-  },
-  Matemática: {
-    horarios: ['Quarta: 10h às 12h'],
-    aulas: ['Segunda: 13h às 15h', 'Quarta: 10h às 12h'],
-    materiais: ['Resumo_Trigonometria.pdf'],
-    listas: ['ExerciciosFuncoes.pdf'],
-    comentarios: [
-      '@Aluno4: Agora entendi logaritmo de verdade!',
-      '@Aluno5: Lista de exercícios muito boa pra revisar.'
-    ]
-  }
-};
+const API_URL = 'https://HelpStudents.up.railway.app';
 
 export default function DisciplinaDetalheScreen() {
   const navigation = useNavigation();
   const route = useRoute();
 
   const nomeDisciplina = route?.params?.nomeDisciplina;
-  const dados = dadosDisciplinas[nomeDisciplina];
+  const [dados, setDados] = useState(null);
+  const [carregando, setCarregando] = useState(true);
 
-  if (!nomeDisciplina || !dados) {
+  useEffect(() => {
+    const buscarDisciplina = async () => {
+      try {
+        const resposta = await fetch(`${API_URL}/disciplinas`);
+        const disciplinas = await resposta.json();
+        const achada = disciplinas.find(d => d.id === nomeDisciplina);
+        setDados(achada);
+      } catch (e) {
+        console.warn('Erro ao buscar disciplina:', e);
+      } finally {
+        setCarregando(false);
+      }
+    };
+    buscarDisciplina();
+  }, [nomeDisciplina]);
+
+  if (carregando) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#004080" />
+        <Text style={{ marginTop: 10 }}>Carregando disciplina...</Text>
+      </View>
+    );
+  }
+
+  if (!dados) {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>Disciplina não encontrada 😢</Text>
@@ -76,20 +70,20 @@ export default function DisciplinaDetalheScreen() {
 
         <View style={styles.sectionBox}>
           <Text style={styles.sectionTitle}>🕐 Horário fixo de monitoria</Text>
-          {dados.horarios.map((item, i) => (
+          {dados.horarios?.map((item, i) => (
             <Text key={i} style={styles.sectionLine}>• {item}</Text>
           ))}
         </View>
 
         <View style={styles.sectionBox}>
           <Text style={styles.sectionTitle}>📅 Aulas previstas na semana</Text>
-          {dados.aulas.map((item, i) => (
+          {dados.aulas?.map((item, i) => (
             <Text key={i} style={styles.sectionLine}>• {item}</Text>
           ))}
         </View>
 
         <Text style={styles.sectionTitle}>📂 Material Didático</Text>
-        {dados.materiais.map((item, i) => (
+        {dados.materiais?.map((item, i) => (
           <TouchableOpacity key={i} style={styles.fileBox}>
             <Ionicons name="download-outline" size={20} color="#004080" />
             <Text style={styles.fileText}>{item}</Text>
@@ -97,7 +91,7 @@ export default function DisciplinaDetalheScreen() {
         ))}
 
         <Text style={styles.sectionTitle}>📝 Listas de Exercícios</Text>
-        {dados.listas.map((item, i) => (
+        {dados.listas?.map((item, i) => (
           <TouchableOpacity key={i} style={styles.fileBox}>
             <Ionicons name="download-outline" size={20} color="#004080" />
             <Text style={styles.fileText}>{item}</Text>
@@ -106,7 +100,7 @@ export default function DisciplinaDetalheScreen() {
 
         <Text style={styles.sectionTitle}>💬 Comentário dos Estudantes</Text>
         <View style={styles.commentBox}>
-          {dados.comentarios.map((comentario, i) => (
+          {dados.comentarios?.map((comentario, i) => (
             <Text key={i} style={styles.comment}>{comentario}</Text>
           ))}
         </View>
