@@ -1,21 +1,53 @@
 // src/screens/LoginScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Image, Alert, KeyboardAvoidingView, Platform
+  StyleSheet, Image, Alert, KeyboardAvoidingView, Platform, ActivityIndicator
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL =  'https://HelpStudents.up.railway.app';
 
 export default function LoginScreen({ navigation }) {
   const [nome, setNome] = useState('');
   const [senha, setSenha] = useState('');
+  const [carregando, setCarregando] = useState(false);
 
-  const handleLogin = () => {
+  useEffect(() => {
+    const preencherNomeAutomaticamente = async () => {
+      const nomeSalvo = await AsyncStorage.getItem('nomeTemporario');
+      if (nomeSalvo) {
+        setNome(nomeSalvo);
+        await AsyncStorage.removeItem('nomeTemporario');
+      }
+    };
+    preencherNomeAutomaticamente();
+  }, []);
+
+  const handleLogin = async () => {
     if (!nome || !senha) {
       Alert.alert('Erro de login', 'Preencha nome e senha!');
       return;
     }
 
-    navigation.replace('Main');
+    setCarregando(true);
+    try {
+      const resposta = await fetch(`${API_URL}/usuarios?nome=${nome}&senha=${senha}`);
+      const usuarios = await resposta.json();
+
+      if (usuarios.length > 0) {
+        const usuario = usuarios[0];
+        await AsyncStorage.setItem('token', 'token-falso');
+        await AsyncStorage.setItem('usuario', JSON.stringify(usuario));
+        navigation.replace('Main');
+      } else {
+        Alert.alert('Login inválido', 'Usuário ou senha incorretos!');
+      }
+    } catch (e) {
+      Alert.alert('Erro de conexão', 'Não foi possível fazer login.');
+    } finally {
+      setCarregando(false);
+    }
   };
 
   return (
@@ -52,8 +84,12 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
+      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={carregando}>
+        {carregando ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Entrar</Text>
+        )}
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
