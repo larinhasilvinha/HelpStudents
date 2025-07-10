@@ -2,39 +2,108 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, Image, Alert, KeyboardAvoidingView, Platform
+  StyleSheet, Image, Alert, KeyboardAvoidingView, Platform, ActivityIndicator
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const API_URL =  'https://HelpStudents.up.railway.app';
 export default function RegisterScreen({ navigation }) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [carregando, setCarregando] = useState(false); // estava faltando
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!nome || !email || !senha) {
-      Alert.alert('Atenção', 'Preencha todos os campos!');
+      Alert.alert('Erro', 'Preencha todos os campos!');
       return;
     }
 
-    navigation.replace('MainTabs');
+    setCarregando(true);
+
+    const novoUsuario = {
+      nome,
+      email,
+      senha,
+      tipo: 'Aluno',
+      comentario: '',
+      disciplinas: [],
+      fotoPerfil: null
+    };
+
+    try {
+      const resposta = await fetch(`${API_URL}/usuarios`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novoUsuario)
+      });
+
+      if (resposta.ok) {
+        await AsyncStorage.setItem('nomeTemporario', nome);
+        Alert.alert(
+          'Cadastro concluído com sucesso!',
+          'Usuário criado com sucesso.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.replace('Login')
+            }
+          ]
+        );
+      } else {
+        Alert.alert('Erro', 'Não foi possível criar o usuário.');
+      }
+    } catch (e) {
+      Alert.alert('Erro de conexão', 'Não foi possível completar o cadastro.');
+    } finally {
+      setCarregando(false);
+    }
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
       <Image source={require('../../assets/logo.png')} style={styles.logo} />
       <Text style={styles.title}>CADASTRO</Text>
 
       <Text>Nome:</Text>
-      <TextInput style={styles.input} placeholder="Digite seu nome" value={nome} onChangeText={setNome} />
+      <TextInput
+        style={styles.input}
+        placeholder="Digite seu nome"
+        value={nome}
+        onChangeText={setNome}
+      />
 
       <Text>Email:</Text>
-      <TextInput style={styles.input} placeholder="Digite seu email" keyboardType="email-address" value={email} onChangeText={setEmail} />
+      <TextInput
+        style={styles.input}
+        placeholder="Digite seu email"
+        keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
+      />
 
       <Text>Senha:</Text>
-      <TextInput style={styles.input} placeholder="Crie uma senha" secureTextEntry value={senha} onChangeText={setSenha} />
+      <TextInput
+        style={styles.input}
+        placeholder="Crie uma senha"
+        secureTextEntry
+        value={senha}
+        onChangeText={setSenha}
+      />
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Criar Conta</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleRegister}
+        disabled={carregando}
+      >
+        {carregando ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Criar Conta</Text>
+        )}
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
