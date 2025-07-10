@@ -14,6 +14,7 @@ export default function AgendaScreen() {
     { dia: '', horario: '', materia: '', assunto: '' },
   ]);
 
+ const API_URL =  'https://HelpStudents.up.railway.app';
   const chaveStorage = (perfil) => `agenda_${perfil.toLowerCase()}`;
 
   // Carrega dados do AsyncStorage ao trocar tipo
