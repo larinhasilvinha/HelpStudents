@@ -1,13 +1,65 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TextInput,
-  TouchableOpacity
+  TouchableOpacity, ActivityIndicator
 } from 'react-native';
 import { Ionicons, FontAwesome5, FontAwesome } from '@expo/vector-icons';
+
+const API_URL = 'https://HelpStudents.up.railway.app';
 
 export default function ComunidadeScreen() {
   const dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   const calendario = ['02', '03', '04', '05', '06', '07', '08'];
+
+  const [alerta, setAlerta] = useState('');
+  const [agenda, setAgenda] = useState([]);
+  const [monitoresSemana, setMonitoresSemana] = useState([]);
+  const [listas, setListas] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    const carregarComunidade = async () => {
+      try {
+        const [agendaResp, notificacoesResp, disciplinasResp] = await Promise.all([
+          fetch(`${API_URL}/agenda`),
+          fetch(`${API_URL}/notificacoes`),
+          fetch(`${API_URL}/disciplinas`)
+        ]);
+
+        const agendaDados = await agendaResp.json();
+        const notificacoes = await notificacoesResp.json();
+        const disciplinas = await disciplinasResp.json();
+
+        setAgenda(agendaDados[0]?.agenda || []);
+        setAlerta(notificacoes[notificacoes.length - 1]?.texto || '');
+
+        const monitoresFormatados = disciplinas.map((disciplina) => ({
+          materia: disciplina.id,
+          monitores: disciplina.comentarios
+            .filter(c => c.includes('@monitor'))
+            .map(c => c.split(':')[0]) // extrai o nome tipo @monitor1
+        }));
+
+        const todasListas = disciplinas.flatMap(d => d.listas || []);
+        setMonitoresSemana(monitoresFormatados);
+        setListas(todasListas);
+      } catch (e) {
+        console.warn('Erro ao carregar comunidade:', e);
+      } finally {
+        setCarregando(false);
+      }
+    };
+    carregarComunidade();
+  }, []);
+
+  if (carregando) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#004080" />
+        <Text style={{ marginTop: 10 }}>Carregando comunidade...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -18,7 +70,6 @@ export default function ComunidadeScreen() {
           <Text style={styles.headerTitle}> Help Students </Text>
           <FontAwesome name="lightbulb-o" size={20} color="#004080" />
         </View>
-        
       </View>
 
       {/* Barra de pesquisa */}
@@ -29,48 +80,48 @@ export default function ComunidadeScreen() {
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-
         {/* Alerta */}
         <View style={styles.alertBox}>
-          <Text style={styles.alertText}>
-            📣 @aluno7: Hoje nossa monitoria será de <Text style={{ fontWeight: 'bold' }}>12h às 14h</Text>.
-          </Text>
+          <Text style={styles.alertText}>{alerta || '📣 Nenhum alerta no momento.'}</Text>
         </View>
 
         {/* Agenda */}
         <View style={styles.agendaBox}>
           <Text style={styles.sectionTitle}>📅 Sua agenda</Text>
-          <View style={styles.dayRow}>
-            {dias.map((dia, i) => (
-              <Text key={i} style={styles.dayText}>{dia}</Text>
-            ))}
-          </View>
-          <View style={styles.namesRow}>
-            <Text style={styles.nameText}>@aluno5</Text>
-            <Text style={styles.nameText}>@aluno6</Text>
-          </View>
+          {agenda.length === 0 ? (
+            <Text style={{ color: '#666' }}>Nenhum horário disponível.</Text>
+          ) : (
+            agenda.map((item, i) => (
+              <View key={i} style={{ marginVertical: 5 }}>
+                <Text style={{ fontWeight: '600' }}>{item.dia}</Text>
+                <Text>{item.horario} — {item.materia}: {item.assunto}</Text>
+              </View>
+            ))
+          )}
         </View>
 
         {/* Monitores da Semana */}
         <Text style={styles.sectionTitle}>👨‍🏫 Monitores da Semana</Text>
         <View style={styles.monitorBox}>
-          <Text>• Química: @monitor2</Text>
-          <Text>• Português: @monitor1, @monitor3</Text>
-          <Text>• Biologia: @monitor4</Text>
-          <Text>• Física: @monitor7</Text>
-          <Text>• Redação: @monitor3, @monitor8</Text>
+          {monitoresSemana.map((item, i) => (
+            <Text key={i}>
+              • {item.materia}: {item.monitores.join(', ')}
+            </Text>
+          ))}
         </View>
 
         {/* Exercícios */}
         <Text style={styles.sectionTitle}>📄 Listas de Exercícios</Text>
-        <TouchableOpacity style={styles.fileBox}>
-          <Ionicons name="document-text-outline" size={20} color="#004080" />
-          <Text style={styles.fileText}>ExercícioQuímica.pdf</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.fileBox}>
-          <Ionicons name="document-text-outline" size={20} color="#004080" />
-          <Text style={styles.fileText}>ExercícioFísica.pdf</Text>
-        </TouchableOpacity>
+        {listas.length === 0 ? (
+          <Text style={{ color: '#666' }}>Nenhuma lista disponível.</Text>
+        ) : (
+          listas.map((lista, index) => (
+            <TouchableOpacity key={index} style={styles.fileBox}>
+              <Ionicons name="document-text-outline" size={20} color="#004080" />
+              <Text style={styles.fileText}>{lista}</Text>
+            </TouchableOpacity>
+          ))
+        )}
 
         {/* Calendário horizontal */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.calendarScroll}>
@@ -84,7 +135,14 @@ export default function ComunidadeScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E0F2FE',
+  },
   container: {
     flex: 1,
     backgroundColor: '#E0F2FE',
@@ -128,25 +186,6 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
-  },
-  dayRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  dayText: {
-    fontWeight: '600',
-    color: '#666',
-  },
-  namesRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginTop: 10,
-    gap: 20,
-  },
-  nameText: {
-    color: '#004080',
-    fontWeight: 'bold',
   },
   sectionTitle: {
     fontSize: 16,
