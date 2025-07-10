@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function InitialScreen({ navigation }) {
   return (
@@ -7,12 +14,12 @@ export default function InitialScreen({ navigation }) {
       {/* Botão de Notificações */}
       <TouchableOpacity
         style={styles.notification}
-        onPress={() => navigation.navigate('Notifications')}
+        onPress={() => navigation.navigate('Notificações')}
       >
-        <Text style={styles.notificationText}>🔔</Text>
+        <Ionicons name="notifications-outline" size={28} color="#fff" />
       </TouchableOpacity>
 
-      {/* A LOGO como LINK para Login */}
+      {/* Logo como link para login */}
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Image
           source={require('../../assets/logo.png')}
@@ -21,7 +28,7 @@ export default function InitialScreen({ navigation }) {
         />
       </TouchableOpacity>
 
-      <Text style={styles.title}></Text>
+      <Text style={styles.title}>Bem-vindo ao Help Students 💙</Text>
     </View>
   );
 }
@@ -36,12 +43,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   logo: {
-    width: 400,
-    height: 400,
-    marginBottom: 20,
+    width: 300,
+    height: 300,
+    marginBottom: 10,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: '#004080',
     marginBottom: 10,
@@ -50,8 +57,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 40,
     right: 20,
+    backgroundColor: '#004080',
+    borderRadius: 25,
+    padding: 8,
   },
   notificationText: {
     fontSize: 24,
+    color: '#fff',
   },
 });
